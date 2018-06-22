@@ -26,7 +26,7 @@ def acc_login(request):
         else:
             error_msg = '用户名或密码错误！'
 
-    return render(request, 'login.html', {'error_msg': error_msg})
+    return render(request, 'login.html', {'error_msg': error_msg, 'app_title': "mojicai system"})
 
 
 @login_required

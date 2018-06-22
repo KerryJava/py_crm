@@ -39,10 +39,6 @@
                         <li><a href="{% if menu.url_type == 0 %}{{ menu.url_name }}{% else %}{% url menu.url_name %}{% endif %}">{{ menu.name }}</a></li>
                     {%  endfor %}
 
-
-                    <li> 1test </li>
-                    <li> 1test {{ request.user.username  }} </li>
-                    <li> 1test {{ request.user.userprofile}} </li>
                     {%  for role in request.user.userprofile.role.select_related %}
                         <li> test </li>
                         {% for menu in role.menus.select_related %}
