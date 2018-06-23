@@ -55,4 +55,16 @@ def table_obj_list(request, app_name, model_name):
     print("model", admin_class.model)
     querysets = admin_class.model.objects.all()
     print(querysets)
+    querysets,filter_conditions = get_filter_result(request,querysets)
+    admin_class.filter_conditions = filter_conditions
     return render(request, 'kingadmin/table_obj_list.html', {'querysets': querysets, "admin_class":admin_class})
+
+
+def get_filter_result(request,querysets):
+    filter_conditions = {}
+    #获取过滤的字段
+    for key,val in request.GET.items():
+        if val:
+            filter_conditions[key] = val
+    #返回过滤后的数据
+    return querysets.filter(**filter_conditions),filter_conditions
