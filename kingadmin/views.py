@@ -5,6 +5,7 @@ from django.shortcuts import render
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from kingadmin import app_setup
 
 # 程序已启动就自动执行
@@ -57,6 +58,17 @@ def table_obj_list(request, app_name, model_name):
     print(querysets)
     querysets,filter_conditions = get_filter_result(request,querysets)
     admin_class.filter_conditions = filter_conditions
+
+      #分页
+    paginator = Paginator(querysets, 2)
+    page = request.GET.get('page')
+    try:
+        querysets = paginator.page(page)
+    except PageNotAnInteger:
+        querysets = paginator.page(1)
+    except EmptyPage:
+        querysets = paginator.page(paginator.num_pages)
+
     return render(request, 'kingadmin/table_obj_list.html', {'querysets': querysets, "admin_class":admin_class})
 
 
@@ -64,6 +76,7 @@ def get_filter_result(request,querysets):
     filter_conditions = {}
     #获取过滤的字段
     for key,val in request.GET.items():
+        if key == 'page': continue
         if val:
             filter_conditions[key] = val
     #返回过滤后的数据
