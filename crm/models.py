@@ -50,7 +50,7 @@ class CustomerInfo(models.Model):
     consult_courses = models.ManyToManyField('Course', verbose_name='咨询课程')
     consult_content = models.TextField('咨询内容', )
     status_choices = ((0, '未报名'), (1, '已报名'), (2, '已经退学'))
-    status = models.SmallIntegerField('客户状态', choices=status_choices)
+    status = models.SmallIntegerField('客户状态', choices=status_choices, default=0)
     consultant = models.ForeignKey('UserProfile', verbose_name='课程顾问', on_delete=models.CASCADE)
     date = models.DateField('创建的时间', auto_now_add=True)
 

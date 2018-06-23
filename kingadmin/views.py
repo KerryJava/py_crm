@@ -157,7 +157,7 @@ def table_obj_add(request,app_name,model_name):
     '''kingadmin 数据添加'''
 
     admin_class = site.enable_admins[app_name][model_name]
-    model_form = form_handle.create_dynamic_model_form(admin_class)
+    model_form = form_handle.create_dynamic_model_form(admin_class, form_add=True)
 
     if request.method == 'GET':
         form_obj = model_form()
