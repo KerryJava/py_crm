@@ -135,6 +135,40 @@ def table_obj_change(request, app_name, model_name, obj_id):
     admin_class = site.enable_admins[app_name][model_name]
     model_form = form_handle.create_dynamic_model_form(admin_class)
     # 实例化
-    form_obj = model_form()
-    print("form_obj", form_obj.my_name())
+    obj = admin_class.model.objects.get(id=obj_id)
+
+    #修改
+    if request.method == 'GET':
+        form_obj = model_form(instance=obj)
+        print("form_obj", form_obj.my_name())
+
+    elif request.method == 'POST':
+        form_obj = model_form(instance=obj,data=request.POST)
+        if form_obj.is_valid():
+            form_obj.save()
+            #修改后跳转到的页面
+            return redirect("/kingadmin/%s/%s/"%(app_name,model_name))
+
     return render(request, 'kingadmin/table_obj_change.html', locals())
+
+
+@login_required
+def table_obj_add(request,app_name,model_name):
+    '''kingadmin 数据添加'''
+
+    admin_class = site.enable_admins[app_name][model_name]
+    model_form = form_handle.create_dynamic_model_form(admin_class)
+
+    if request.method == 'GET':
+        form_obj = model_form()
+    elif request.method == 'POST':
+        form_obj = model_form(data=request.POST)
+        if form_obj.is_valid():
+            form_obj.save()
+            #跳转到的页面
+            return redirect("/kingadmin/%s/%s/"%(app_name,model_name))
+    return render(request, 'kingadmin/table_obj_add.html', locals())
+
+
+def table_obj_delete(request, app_name, model_name, obj_id):
+    pass
