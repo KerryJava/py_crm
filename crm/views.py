@@ -1,13 +1,19 @@
 # -*- coding: utf-8 -*-
+
 from __future__ import unicode_literals
 from django.shortcuts import render
 # Create your views here.
-
+import sys
+sys.path.append("..")
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from .models import UserProfile, Role, Menus
+# from kingadmin import app_setup
+
+# 程序一启动就自动执行
+# app_setupup.kingadmin_auto_discover()
 
 
 def acc_login(request):
@@ -51,7 +57,6 @@ def dashboard(request):
         for role in roles:
             print (role.menus.all())
             menus = menus + list(role.menus.all())
-
 
     return render(request, 'crm/dashboard.html', locals())
 
