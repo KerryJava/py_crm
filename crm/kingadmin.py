@@ -4,8 +4,9 @@
 
 from crm import models
 from common import admin_base
+from common.sites import site
 
-# from kingadmin.sites import site
+#from kingadmin.sites import site
 
 print('crm kingadmin....')
 
@@ -17,6 +18,8 @@ class CustomerAdmin(admin_base.BaseKingAdmin):
     list_filter = ['source', 'consultant', 'status', 'date']
     search_fields = ['contact', 'consultant__name']
     readonly_fields = ['status']
+    filter_horizontal = ["consultant_course", ]
+    pass
 
 
 customModel = models.CustomerInfo
@@ -24,5 +27,8 @@ customModel = models.CustomerInfo
 
 def get_admin_and_model():
     return CustomerAdmin, [customModel, models.Role, models.Menus]
+    pass
 
-# site.register(models.CustomerInfo,CustomerAdmin)
+site.register(models.CustomerInfo, CustomerAdmin)
+site.register(models.Role)
+site.register(models.Menus)

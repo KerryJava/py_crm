@@ -13,8 +13,8 @@ def kingadmin_auto_discover():
             # print("success")
             method_to_call = getattr(mod.kingadmin, 'get_admin_and_model')
             admin , models = method_to_call()
-            for model in models:
-                sites.site.register(model, admin)
+            # for model in models:
+                # sites.site.register(model, admin)
             print('site', sites.site.enable_admins)
             pass
         except ImportError as e:

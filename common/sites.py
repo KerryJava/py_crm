@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 from common.admin_base import BaseKingAdmin
 
+
 class AdminSite(object):
     def __init__(self):
         self.enable_admins = {}
 
     # 两个参数，一个表名，一个自定义的admin类
-    def register(self, model_class, admin_class=BaseKingAdmin):
+    def register(self, model_class, admin_class=None):
         '''注册admin表'''
 
         # print('register',model_class,admin_class)
@@ -17,7 +18,8 @@ class AdminSite(object):
         print("register model_name", model_name)
 
         if not admin_class:
-            admin_class = BaseKingAdmin
+            admin_class = BaseKingAdmin()
+            print("create base king admin ", model_class)
         else:
             admin_class = admin_class()
 
@@ -25,6 +27,7 @@ class AdminSite(object):
 
         if app_name not in self.enable_admins:
             self.enable_admins[app_name] = {}
+
         self.enable_admins[app_name][model_name] = admin_class
 
 
