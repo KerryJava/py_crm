@@ -75,7 +75,7 @@ def table_obj_list(request, app_name, model_name):
         querysets = paginator.page(paginator.num_pages)
 
     return render(request, 'kingadmin/table_obj_list.html',
-                  {'querysets': querysets, "admin_class": admin_class, "sorted_column": sorted_column})
+                  {'querysets': querysets, "admin_class": admin_class, "sorted_column": sorted_column, "app_name":app_name})
 
 
 def get_filter_result(request, querysets):
