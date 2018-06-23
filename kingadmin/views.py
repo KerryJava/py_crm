@@ -58,6 +58,10 @@ def table_obj_list(request, app_name, model_name):
     print(querysets)
     querysets, filter_conditions = get_filter_result(request, querysets)
     admin_class.filter_conditions = filter_conditions
+
+    querysets = get_searched_result(request, querysets, admin_class)
+    admin_class.search_key = request.GET.get('_q', "")
+
     querysets, sorted_column = get_orderby_result(request, querysets, admin_class)
 
     # 分页
@@ -102,3 +106,21 @@ def get_orderby_result(request, querysets, admin_class):
         return querysets.order_by(orderby_key), current_ordered_column
     else:
         return querysets, current_ordered_column
+
+
+from django.db.models import Q
+
+
+def get_searched_result(request, querysets, admin_class):
+    '''搜索'''
+
+    search_key = request.GET.get('_q')
+    if search_key:
+        q = Q()
+        q.connector = 'OR'
+
+        for search_field in admin_class.search_fields:
+            q.children.append(("%s__contains" % search_field, search_key))
+
+        return querysets.filter(q)
+    return querysets

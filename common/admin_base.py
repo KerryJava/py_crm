@@ -5,5 +5,6 @@ class BaseKingAdmin(object):
     list_filter = []
 
     search_fields = []
+    search_key = None
 
 pass
