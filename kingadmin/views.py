@@ -7,6 +7,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from kingadmin import app_setup
+from kingadmin import form_handle
 
 # 程序已启动就自动执行
 app_setup.kingadmin_auto_discover()
@@ -75,7 +76,8 @@ def table_obj_list(request, app_name, model_name):
         querysets = paginator.page(paginator.num_pages)
 
     return render(request, 'kingadmin/table_obj_list.html',
-                  {'querysets': querysets, "admin_class": admin_class, "sorted_column": sorted_column, "app_name":app_name})
+                  {'querysets': querysets, "admin_class": admin_class, "sorted_column": sorted_column,
+                   "app_name": app_name})
 
 
 def get_filter_result(request, querysets):
@@ -124,3 +126,15 @@ def get_searched_result(request, querysets, admin_class):
 
         return querysets.filter(q)
     return querysets
+
+
+@login_required
+def table_obj_change(request, app_name, model_name, obj_id):
+    '''kingadmin 数据修改页'''
+
+    admin_class = site.enable_admins[app_name][model_name]
+    model_form = form_handle.create_dynamic_model_form(admin_class)
+    # 实例化
+    form_obj = model_form()
+    print("form_obj", form_obj.my_name())
+    return render(request, 'kingadmin/table_obj_change.html', locals())
