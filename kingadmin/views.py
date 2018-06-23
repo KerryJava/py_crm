@@ -56,10 +56,11 @@ def table_obj_list(request, app_name, model_name):
     print("model", admin_class.model)
     querysets = admin_class.model.objects.all()
     print(querysets)
-    querysets,filter_conditions = get_filter_result(request,querysets)
+    querysets, filter_conditions = get_filter_result(request, querysets)
     admin_class.filter_conditions = filter_conditions
+    querysets, sorted_column = get_orderby_result(request, querysets, admin_class)
 
-      #分页
+    # 分页
     paginator = Paginator(querysets, 2)
     page = request.GET.get('page')
     try:
@@ -69,15 +70,35 @@ def table_obj_list(request, app_name, model_name):
     except EmptyPage:
         querysets = paginator.page(paginator.num_pages)
 
-    return render(request, 'kingadmin/table_obj_list.html', {'querysets': querysets, "admin_class":admin_class})
+    return render(request, 'kingadmin/table_obj_list.html',
+                  {'querysets': querysets, "admin_class": admin_class, "sorted_column": sorted_column})
 
 
-def get_filter_result(request,querysets):
+def get_filter_result(request, querysets):
     filter_conditions = {}
-    #获取过滤的字段
-    for key,val in request.GET.items():
-        if key == 'page': continue
+    # 获取过滤的字段
+    for key, val in request.GET.items():
+        if key in ('page', '_o', '_q'): continue
         if val:
             filter_conditions[key] = val
-    #返回过滤后的数据
-    return querysets.filter(**filter_conditions),filter_conditions
+    # 返回过滤后的数据
+    return querysets.filter(**filter_conditions), filter_conditions
+
+
+def get_orderby_result(request, querysets, admin_class):
+    '''排序'''
+
+    current_ordered_column = {}
+    # 通过前端获取到要排序的字段的索引（是个字符串）
+    orderby_index = request.GET.get('_o')
+    if orderby_index:
+        # 通过索引找到要排序的字段,因为索引有可能是负数也有可能是负数，要用绝对值，否则负值的时候取到了其它字段了
+        orderby_key = admin_class.list_display[abs(int(orderby_index))]
+        # 记录下当前是按什么排序字段的
+        current_ordered_column[orderby_key] = orderby_index
+        if orderby_index.startswith('-'):
+            orderby_key = '-' + orderby_key
+
+        return querysets.order_by(orderby_key), current_ordered_column
+    else:
+        return querysets, current_ordered_column
