@@ -59,7 +59,7 @@ def dashboard(request):
 
     menus = []
 
-    profile_list = UserProfile.objects.filter(user=user)
+    profile_list = UserProfile.objects.filter(email=user.email)
     for profile_item in profile_list:
         print(profile_item.name)
         print(type(profile_item))
