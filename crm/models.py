@@ -65,6 +65,9 @@ class Student(models.Model):
     def __str__(self):
         return self.customer.__str__()
 
+    class Meta:
+        get_latest_by = 'customer'
+
 
 class CustomerFollowUp(models.Model):
     '''客户跟踪记录表'''

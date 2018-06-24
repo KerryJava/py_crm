@@ -17,7 +17,7 @@ admin.site.register(models.Branch)
 admin.site.register(models.Menus)
 admin.site.register(models.UserProfile)
 admin.site.register(models.ContractTemplate)
-
+admin.site.register(models.StudentEnrollment)
 
 class CustomerAdmin(admin.ModelAdmin):
     #显示
