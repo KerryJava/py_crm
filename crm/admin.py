@@ -16,6 +16,7 @@ admin.site.register(models.StudyRecord)
 admin.site.register(models.Branch)
 admin.site.register(models.Menus)
 admin.site.register(models.UserProfile)
+admin.site.register(models.ContractTemplate)
 
 
 class CustomerAdmin(admin.ModelAdmin):

@@ -7,7 +7,6 @@ __author__ = 'derek'
 
 from django.db import models
 from django.contrib.auth.models import User
-
 import sys
 
 reload(sys)
@@ -101,6 +100,7 @@ class ClassList(models.Model):
     start_date = models.DateField('开班日期', )
     # 毕业日期因为不固定，所以可以为空
     graduate_date = models.DateField('毕业日期', blank=True, null=True)
+    contract_template = models.ForeignKey('crm.ContractTemplate', blank=True, null=True, on_delete=models.CASCADE)
 
     def __str__(self):
         # 班级名是课程名+第几期拼接起来的
@@ -187,3 +187,51 @@ class Menus(models.Model):
 
     class Meta:
         unique_together = ('name', 'url_name')
+
+
+'''
+register
+'''
+
+
+class ContractTemplate(models.Model):
+    '''存储合同模板'''
+    name = models.CharField(max_length=64)
+    content = models.TextField()
+    date = models.DateField(auto_now_add=True)
+
+    class Meta:
+        app_label = 'crm'
+        pass
+    def __str__(self):
+        return ('%s' % self.name).encode('utf-8')
+
+
+class StudentEnrollment(models.Model):
+    """学员报名表"""
+    customer = models.ForeignKey('CustomerInfo', on_delete=models.CASCADE)
+    class_grade = models.ForeignKey('ClassList', on_delete=models.CASCADE)
+    consultant = models.ForeignKey('UserProfile', on_delete=models.CASCADE)
+    contract_agreed = models.BooleanField(default=False)
+    contract_signed_date = models.DateTimeField(blank=True, null=True)
+    contract_approved = models.BooleanField(default=False)
+    consultant_approved_date = models.DateTimeField('合同审核时间', blank=True, null=True)
+
+    class Meta:
+        unique_together = ('customer', 'class_grade')
+
+    def __str__(self):
+        return '%s' % self.customer
+
+
+class PaymentRecord(models.Model):
+    '''存储学员缴费记录'''
+    enrollment = models.ForeignKey('StudentEnrollment', on_delete=models.CASCADE)
+    payment_type_choices = ((0, '报名费'), (1, '学费'), (2, '退费'))
+    payment_type = models.SmallIntegerField(choices=payment_type_choices, default=0)
+    amount = models.IntegerField('费用', default=500)
+    consultant = models.ForeignKey('UserProfile', on_delete=models.CASCADE)
+    date = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return '%s' % self.enrollment

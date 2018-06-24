@@ -34,6 +34,17 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-sm-3 col-md-2 sidebar">
+
+               <ul class="nav nav-sidebar">
+                        {% for menu in menus %}
+                            {% if request.path == menu.url_name %}
+                                <li class="active"><a href="{% if menu.url_type == 0 %}{{ menu.url_name }}{% else %}{% url menu.url_name %}{% endif %}">{{ menu.name }}</a></li>
+                            {% else %}
+                                <li ><a href="{% if menu.url_type == 0 %}{{ menu.url_name }}{% else %}{% url menu.url_name %}{% endif %}">{{ menu.name }}</a></li>
+                            {% endif %}
+                        {% endfor %}
+                </ul>
+
                 <ul class="nav nav-sidebar">
                     {% for role in  request.user.role.select_related %}
                         {% for menu in role.menus.select_related %}

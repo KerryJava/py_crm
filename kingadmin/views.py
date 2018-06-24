@@ -8,6 +8,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from kingadmin import app_setup
 from kingadmin import form_handle
+from crm.models import UserProfile
 
 import json
 
@@ -45,9 +46,27 @@ def acc_logout(request):
     logout(request)
     return redirect("/login/")
 
-
+@login_required()
 def app_index(request):
-    return render(request, 'kingadmin/app_index.html', {'site': site})
+
+    user = request.user
+    menus = []
+
+    profile_list = UserProfile.objects.filter(user=user)
+    for profile_item in profile_list:
+        print(profile_item.name)
+        print(type(profile_item))
+        print(type(profile_item.role))
+        print(profile_item.role.all())
+        roles = profile_item.role.all()
+
+        for role in roles:
+            print (role.menus.all())
+            menus = menus + list(role.menus.all())
+
+    dict = {"site": site}
+    dict.update(locals())
+    return render(request, 'kingadmin/app_index.html', dict)
 
 
 @login_required
@@ -98,10 +117,7 @@ def table_obj_list(request, app_name, model_name):
     except EmptyPage:
         querysets = paginator.page(paginator.num_pages)
 
-    return render(request, 'kingadmin/table_obj_list.html',
-                  {'querysets': querysets, "admin_class": admin_class, "sorted_column": sorted_column,
-                   "app_name": app_name})
-
+    return render(request, 'kingadmin/table_obj_list.html', locals())
 
 def get_filter_result(request, querysets):
     filter_conditions = {}
