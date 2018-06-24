@@ -241,10 +241,18 @@ def display_all_related_objs(obj):
     """
     ele = "<ul><b style='color:red'>%s</b>" % obj
 
+    print("display_all_related_objs")
+    print(obj)
+    if obj is None or obj == "":
+       print("obj is empty")
+       return ""
+
     # 获取所有反向关联的对象
     for reversed_fk_obj in obj._meta.related_objects:
         # 获取所有反向关联对象的表名
         related_table_name = reversed_fk_obj.name
+        print("related_table_name")
+        print(related_table_name)
         # 通过表名反向查所有关联的数据
         related_lookup_key = "%s_set" % related_table_name
         related_objs = getattr(obj, related_lookup_key).all()

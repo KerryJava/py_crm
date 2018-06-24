@@ -9,6 +9,8 @@ from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from kingadmin import app_setup
 from kingadmin import form_handle
 
+import json
+
 # 程序已启动就自动执行
 app_setup.kingadmin_auto_discover()
 
@@ -55,8 +57,29 @@ def table_obj_list(request, app_name, model_name):
     admin_class = site.enable_admins[app_name][model_name]
     print("class ", admin_class)
     print("model", admin_class.model)
-    querysets = admin_class.model.objects.all()
-    print(querysets)
+
+        #kingadmin actoin
+    if request.method == "POST":
+        #获取action
+        selected_action = request.POST.get('action')
+        print(selected_action)
+        #获取选中的id
+        selected_ids = json.loads(request.POST.get('selected_ids'))
+        #如果有action参数，代表这是一个正常的action执行动作,如果没有，代表可能是一个删除动作
+        if not selected_action:
+            #选中的数据(selected_ids)都删除
+            if selected_ids:
+                admin_class.model.objects.filter(id__in=selected_ids).delete()
+        else:
+            #获取所有选中id的对象
+            selected_objs = admin_class.model.objects.filter(id__in=selected_ids)
+            admin_action_func = getattr(admin_class,selected_action)
+            #把数据返回到前端
+            response = admin_action_func(request,selected_objs)
+            if response:
+                return response
+
+    querysets = admin_class.model.objects.all().order_by('-id')
     querysets, filter_conditions = get_filter_result(request, querysets)
     admin_class.filter_conditions = filter_conditions
 

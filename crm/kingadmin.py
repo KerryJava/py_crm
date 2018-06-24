@@ -19,10 +19,13 @@ class CustomerAdmin(admin_base.BaseKingAdmin):
     search_fields = ['contact', 'consultant__name']
     readonly_fields = ['status']
     filter_horizontal = ["consult_courses"]
-    pass
+    actions = ['change_status']
 
+    def change_status(self, request, querysets):
+        querysets.update(status=2)
 
 customModel = models.CustomerInfo
+
 
 
 def get_admin_and_model():
