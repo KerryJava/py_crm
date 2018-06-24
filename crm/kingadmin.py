@@ -18,7 +18,7 @@ class CustomerAdmin(admin_base.BaseKingAdmin):
     list_filter = ['source', 'consultant', 'status', 'date']
     search_fields = ['contact', 'consultant__name']
     readonly_fields = ['status']
-    filter_horizontal = ["consultant_course", ]
+    filter_horizontal = ["consult_courses"]
     pass
 
 
@@ -32,3 +32,8 @@ def get_admin_and_model():
 site.register(models.CustomerInfo, CustomerAdmin)
 site.register(models.Role)
 site.register(models.Menus)
+site.register(models.Course)
+site.register(models.Student)
+site.register(models.StudyRecord)
+site.register(models.CourseRecord)
+site.register(models.ClassList)

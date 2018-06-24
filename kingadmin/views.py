@@ -137,23 +137,23 @@ def table_obj_change(request, app_name, model_name, obj_id):
     # 实例化
     obj = admin_class.model.objects.get(id=obj_id)
 
-    #修改
+    # 修改
     if request.method == 'GET':
         form_obj = model_form(instance=obj)
         print("form_obj", form_obj.my_name())
 
     elif request.method == 'POST':
-        form_obj = model_form(instance=obj,data=request.POST)
+        form_obj = model_form(instance=obj, data=request.POST)
         if form_obj.is_valid():
             form_obj.save()
-            #修改后跳转到的页面
-            return redirect("/kingadmin/%s/%s/"%(app_name,model_name))
+            # 修改后跳转到的页面
+            return redirect("/kingadmin/%s/%s/" % (app_name, model_name))
 
     return render(request, 'kingadmin/table_obj_change.html', locals())
 
 
 @login_required
-def table_obj_add(request,app_name,model_name):
+def table_obj_add(request, app_name, model_name):
     '''kingadmin 数据添加'''
 
     admin_class = site.enable_admins[app_name][model_name]
@@ -165,10 +165,18 @@ def table_obj_add(request,app_name,model_name):
         form_obj = model_form(data=request.POST)
         if form_obj.is_valid():
             form_obj.save()
-            #跳转到的页面
-            return redirect("/kingadmin/%s/%s/"%(app_name,model_name))
+            # 跳转到的页面
+            return redirect("/kingadmin/%s/%s/" % (app_name, model_name))
     return render(request, 'kingadmin/table_obj_add.html', locals())
 
 
 def table_obj_delete(request, app_name, model_name, obj_id):
-    pass
+    '''删除功能'''
+    admin_class = site.enable_admins[app_name][model_name]
+    obj = admin_class.model.objects.get(id=obj_id)
+
+    if request.method == 'POST':
+        obj.delete()
+        return redirect("/kingadmin/%s/%s/" % (app_name, model_name))
+
+    return render(request, 'kingadmin/table_obj_delete.html', locals())
