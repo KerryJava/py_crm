@@ -284,7 +284,7 @@ class UserProfile(AbstractBaseUser,PermissionsMixin):
     role = models.ManyToManyField(Role, blank=True, null=True)
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
-    is_staff = models.BooleanField(default=False)
+   # is_staff = models.BooleanField(default=False)
     #创建用户和超级用户，关联上面的
     objects = UserProfileManager()
 
@@ -313,13 +313,20 @@ class UserProfile(AbstractBaseUser,PermissionsMixin):
         # The user is identified by their email address
         return self.email
 
-    @property
+    # @property
     def is_staff(self):
         "Is the user a member of staff?"
         # Simplest possible answer: All admins are staff
         return self.is_admin
     def __str__(self):
-        return '%s' % self.enrollment
+        return '%s' % self.email
 
-
+    class Meta:
+        permissions = (
+            ('crm_table_list','可以查看每张表里所有的数据'),
+            ('crm_table_list_view','可以访问表里每条数据的修改页'),
+            ('crm_table_list_change','可以对表里的每条数据进行修改'),
+            ('crm_table_list_add_view','可以访问数据增加页'),
+            ('crm_table_list_add','可以添加表数据'),
+        )
 

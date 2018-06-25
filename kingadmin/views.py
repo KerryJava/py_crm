@@ -6,10 +6,11 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
+from django.conf import settings
 from kingadmin import app_setup
 from kingadmin import form_handle
 from crm.models import UserProfile
-
+from kingadmin import permissions
 import json
 
 # 程序已启动就自动执行
@@ -44,15 +45,15 @@ def acc_login(request):
 
 def acc_logout(request):
     logout(request)
-    return redirect("/login/")
+    return redirect("/kingadmin/login/")
+
 
 @login_required()
 def app_index(request):
-
     user = request.user
     menus = []
 
-    profile_list = UserProfile.objects.filter(email=user.email)
+    profile_list = UserProfile.objects.filter(id=user.id)
     for profile_item in profile_list:
         print(profile_item.name)
         print(type(profile_item))
@@ -65,6 +66,7 @@ def app_index(request):
             menus = menus + list(role.menus.all())
 
     dict = {"site": site}
+    dict.update({"project_name" : settings.PROJECT_NAME})
     dict.update(locals())
     return render(request, 'kingadmin/app_index.html', dict)
 
@@ -77,28 +79,29 @@ def table_obj_list(request, app_name, model_name):
     print("class ", admin_class)
     print("model", admin_class.model)
 
-        #kingadmin actoin
+    # kingadmin actoin
     if request.method == "POST":
-        #获取action
+        # 获取action
         selected_action = request.POST.get('action')
         print(selected_action)
-        #获取选中的id
+        # 获取选中的id
         selected_ids = json.loads(request.POST.get('selected_ids'))
-        #如果有action参数，代表这是一个正常的action执行动作,如果没有，代表可能是一个删除动作
+        # 如果有action参数，代表这是一个正常的action执行动作,如果没有，代表可能是一个删除动作
         if not selected_action:
-            #选中的数据(selected_ids)都删除
+            # 选中的数据(selected_ids)都删除
             if selected_ids:
                 admin_class.model.objects.filter(id__in=selected_ids).delete()
         else:
-            #获取所有选中id的对象
+            # 获取所有选中id的对象
             selected_objs = admin_class.model.objects.filter(id__in=selected_ids)
-            admin_action_func = getattr(admin_class,selected_action)
-            #把数据返回到前端
-            response = admin_action_func(request,selected_objs)
+            admin_action_func = getattr(admin_class, selected_action)
+            # 把数据返回到前端
+            response = admin_action_func(request, selected_objs)
             if response:
                 return response
 
     querysets = admin_class.model.objects.all().order_by('-id')
+    print("admin models ", querysets)
     querysets, filter_conditions = get_filter_result(request, querysets)
     admin_class.filter_conditions = filter_conditions
 
@@ -118,6 +121,7 @@ def table_obj_list(request, app_name, model_name):
         querysets = paginator.page(paginator.num_pages)
 
     return render(request, 'kingadmin/table_obj_list.html', locals())
+
 
 def get_filter_result(request, querysets):
     filter_conditions = {}
@@ -167,6 +171,7 @@ def get_searched_result(request, querysets, admin_class):
     return querysets
 
 
+@permissions.check_permission
 @login_required
 def table_obj_change(request, app_name, model_name, obj_id):
     '''kingadmin 数据修改页'''
@@ -191,6 +196,7 @@ def table_obj_change(request, app_name, model_name, obj_id):
     return render(request, 'kingadmin/table_obj_change.html', locals())
 
 
+@permissions.check_permission
 @login_required
 def table_obj_add(request, app_name, model_name):
     '''kingadmin 数据添加'''
@@ -209,6 +215,8 @@ def table_obj_add(request, app_name, model_name):
     return render(request, 'kingadmin/table_obj_add.html', locals())
 
 
+@permissions.check_permission
+@login_required
 def table_obj_delete(request, app_name, model_name, obj_id):
     '''删除功能'''
     admin_class = site.enable_admins[app_name][model_name]

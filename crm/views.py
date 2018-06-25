@@ -45,7 +45,7 @@ def acc_login(request):
         else:
             error_msg = '用户名或密码错误！'
 
-    return render(request, 'login.html', {'error_msg': error_msg, 'app_title': "mojicai system"})
+    return render(request, 'login.html', {'error_msg': error_msg, 'app_title': settings.PROJECT_NAME})
 
 
 @login_required
@@ -71,7 +71,9 @@ def dashboard(request):
             print (role.menus.all())
             menus = menus + list(role.menus.all())
 
-    return render(request, 'crm/dashboard.html', locals())
+    dict = locals()
+    dict.update({"project_name" : settings.PROJECT_NAME})
+    return render(request, 'crm/dashboard.html', dict)
 
 
 def acc_logout(request):
@@ -89,7 +91,7 @@ def stu_enrollment(request):
         customer_id = request.POST.get('customer_id')
         class_grade_id = request.POST.get('class_grade_id')
         user = request.user
-        profile = UserProfile.objects.filter(user=user).first()
+        profile = UserProfile.objects.filter(id=user.id).first()
         profile_id = profile.id
         try:
             enrollment_obj = models.StudentEnrollment.objects.create(

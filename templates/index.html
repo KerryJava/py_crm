@@ -13,13 +13,15 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="#">{% block pro_name %}MO project{% endblock %}</a>
+                <a class="navbar-brand" href="#">{% block pro_name %} {{ project_name }} {% endblock %}</a>
             </div>
+            {{ project_name }}
             <div id="navbar" class="navbar-collapse collapse">
                 <ul class="nav navbar-nav navbar-right">
 
                     <li class="dropdown ">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button">{{ request.user }} <span class="caret"></span></a>
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button">{{ request.user }}
+                            <span class="caret"></span></a>
                         <ul class="dropdown-menu">
                             <li><a href="#">个人信息</a></li>
                             <li><a href="{% url 'logout' %}">Logout</a></li>
@@ -36,13 +38,17 @@
             <div class="col-sm-3 col-md-2 sidebar">
                 <ul class="nav nav-sidebar">
                     {% for menu in menus %}
-                        <li><a href="{% if menu.url_type == 0 %}{{ menu.url_name }}{% else %}{% url menu.url_name %}{% endif %}">{{ menu.name }}</a></li>
-                    {%  endfor %}
+                        <li><a href="
+                                {% if menu.url_type == 0 %}{{ menu.url_name }}{% else %}{% url menu.url_name %}{% endif %}">{{ menu.name }}</a>
+                        </li>
+                    {% endfor %}
 
-                    {%  for role in request.user.userprofile.role.select_related %}
-                        <li> test </li>
+                    {% for role in request.user.userprofile.role.select_related %}
+                        <li> test</li>
                         {% for menu in role.menus.select_related %}
-                            <li><a href="{% if menu.url_type == 0 %}{{ menu.url_name }}{% else %}{% url menu.url_name %}{% endif %}">{{ menu.name }}</a></li>
+                            <li><a href="
+                                    {% if menu.url_type == 0 %}{{ menu.url_name }}{% else %}{% url menu.url_name %}{% endif %}">{{ menu.name }}</a>
+                            </li>
                         {% endfor %}
 
                     {% endfor %}
@@ -52,7 +58,7 @@
             </div>
             <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
                 {% block right-content-container %}
-                <h2 class="page-header">Dashboard</h2>
+                    <h2 class="page-header">Dashboard</h2>
                 {% endblock %}
             </div>
         </div>
